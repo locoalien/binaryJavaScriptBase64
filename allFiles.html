@@ -1,0 +1,66 @@
+<html>
+
+<head></head>
+
+<body>
+    <div>
+        <div>
+            <label for="subirArchivo">Buscar archivo:</label><br>
+            <input type="file" id="subirArchivo">
+        </div>
+        <br>
+        <div>
+            <h1>Convertir Base64</h1>
+            <textarea id="base64textarea" placeholder="Base64 will appear here" cols="50" rows="15"></textarea>
+            <img id="foto" src="" alt="">
+            <br>
+            <a id='archivo' style="display:none;"></a>
+            <a href="#" onclick="downloadPDF()" title='Cotización.pdf'>Has clic para descargar pdf</a>
+        </div>
+    </div>
+    <script>
+
+        //Obtener el binario correcto de cualquier archivo (DOC, EXCEL, PDF , ETC)
+        var obtenerBinario = function (evt) {
+            debugger;
+            var files = evt.target.files;
+            var file = files[0];
+            var extensionFile = file.name.split(".")[1];
+            localStorage.setItem("extensionFile", extensionFile);
+            localStorage.setItem("type", file.type)
+            if (files && file) {
+                var reader = new FileReader();
+
+                reader.onload = function (readerEvt) {
+                    var binaryString = readerEvt.target.result;
+                    document.getElementById("foto").src = "data:" + localStorage.getItem("type") + ";base64," + btoa(binaryString); // Se asignan los datos de base 64
+                    document.getElementById("base64textarea").value = "data:" + localStorage.getItem("type") + ";base64," + btoa(binaryString);
+                };
+
+                reader.readAsBinaryString(file);
+            }
+        };
+
+
+        //Descarga correcta de cualquier archivo, convertido en binario
+        downloadPDF = function downloadPDF() {
+
+            var dlnk = document.getElementById('archivo');
+            dlnk.setAttribute("download", "archivo." + localStorage.getItem("extensionFile"));
+            dlnk.href = document.getElementById("base64textarea").value
+            dlnk.click();
+            parent.window.open( document.getElementById("base64textarea").value,"blank");
+            alert('Descarga');
+        }
+
+
+        //Se agrega el evento de subir archivo
+        if (window.File && window.FileReader && window.FileList && window.Blob) {
+            document.getElementById('subirArchivo').addEventListener('change', obtenerBinario, false);
+        } else {
+            alert('The File APIs are not fully supported in this browser.');
+        }
+    </script>
+</body>
+
+</html>
